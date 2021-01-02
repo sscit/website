@@ -18,8 +18,6 @@ E-Mail: [website@sscit.de](mailto:website@sscit.de)
 # Verantwortlicher für journalistisch-redaktionelle gestaltete Inhalte:
 
 Stefan Schlichthärle\
-_Software Developer_
-
 Bautzener Straße 36\
 80997 München
 
