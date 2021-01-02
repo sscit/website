@@ -4,8 +4,6 @@ title: About
 permalink: /about/
 ---
 
-# About
-
 I am a computer scientist and software developer, working in the field of automotive software engineering. My current role covers software architecture development for high performance computing platforms within vehicles, which power driver assistance and autonomous driving. Besides computer science, I am interested in history of technology and technological progress, especially exponential technological growth and its implications in future.
 
 You can find me on the following well-known platforms:
@@ -15,7 +13,7 @@ You can find me on the following well-known platforms:
 [![Twitter](/assets/twitter.png){:height="100px" width="100px"}](https://www.twitter.com/sscit)
 
 
-## List of Publications
+# List of Publications
 
 2020:
 _A Domain-Specific Language Based Architecture Modeling Approach for Safety Critical Automotive Software Systems_
