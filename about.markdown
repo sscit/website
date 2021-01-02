@@ -10,9 +10,9 @@ I am a computer scientist and software developer, working in the field of automo
 
 You can find me on the following well-known platforms:
 
-[![Github](/assets/gh.png)](https://www.github.com/sscit)
-[![LinkedIn](/assets/linkedin.png)](https://de.linkedin.com/in/stefan-schlichth%C3%A4rle-87913489)
-[![Twitter](/assets/twitter.png)](https://www.twitter.com/sscit)
+[![Github](/assets/gh.png){:height="100px" width="100px"}](https://www.github.com/sscit)
+[![LinkedIn](/assets/linkedin.png){:height="100px" width="100px"}](https://de.linkedin.com/in/stefan-schlichth%C3%A4rle-87913489)
+[![Twitter](/assets/twitter.png){:height="100px" width="100px"}](https://www.twitter.com/sscit)
 
 
 ## List of Publications
