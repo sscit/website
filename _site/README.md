@@ -1,2 +1,2 @@
 # website
-Contains webpage data for sscit.de
+Contains webpage data for [sscit.de](http://www.sscit.de)

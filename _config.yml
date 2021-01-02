@@ -23,7 +23,7 @@ email: website@sscit.de
 description: >- # this means to ignore newlines until "baseurl:"
   Technology and Future.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://www.sscit.de" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://www.sscit.de" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: sscit
 github_username:  sscit
 
