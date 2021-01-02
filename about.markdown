@@ -10,5 +10,14 @@ I am a computer scientist and software developer, working in the field of automo
 
 You can find me on the following well-known platforms:
 
-[![Github](images/gh.png)](https://www.github.com/sscit)
-[![LinkedIn](images/linkedin.png)](https://de.linkedin.com/in/stefan-schlichth%C3%A4rle-87913489)
+[![Github](/assets/gh.png)](https://www.github.com/sscit)
+[![LinkedIn](/assets/linkedin.png)](https://de.linkedin.com/in/stefan-schlichth%C3%A4rle-87913489)
+[![Twitter](/assets/twitter.png)](https://www.twitter.com/sscit)
+
+
+## List of Publications
+
+2020:
+_A Domain-Specific Language Based Architecture Modeling Approach for Safety Critical Automotive Software Systems_
+
+PDF available on [ResearchGate](https://www.researchgate.net/publication/339442213_A_Domain-Specific_Language_Based_Architecture_Modeling_Approach_for_Safety_Critical_Automotive_Software_Systems)
