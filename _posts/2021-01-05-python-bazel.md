@@ -4,7 +4,7 @@ title:  Building and testing C++ Python modules with Bazel
 date:   2021-01-05 16:05:31 +0100
 ---
 
-While working on [REL]({% post_url  2021-01-03-REL %}), I learned a lot about Python's integration in Bazel and the current limitations and workarounds of the build system.
+While working on [REL]({% post_url  2021-01-03-REL %}), I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today's blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.
 
 As part of REL's Python integration, I created a `cc_library` called `rel_py` which includes the core REL C++ library and the necessary Python binding (using the ingenious [pybind11](https://github.com/pybind/pybind11) framework). If the library is built as dynamic library, the resulting _librel_py.so_ file can directly be imported in every Python script via `import` statement. It took me quite some time, though, to model the dependency between a `py_test` rule and the mentioned `cc_library`. My goal was to add an integration test to Bazel, which uses REL within Python, to read a toy model and test the basic functionality, like accessing all type instances, checking the API etc.
 
