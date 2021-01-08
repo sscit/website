@@ -3,22 +3,22 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Building and testing C++ Python modules with Bazel | Technology and Future.</title>
+<title>Building and Testing C++ Python Modules with Bazel | Technology and Future.</title>
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Building and testing C++ Python modules with Bazel" />
+<meta property="og:title" content="Building and Testing C++ Python Modules with Bazel" />
 <meta name="author" content="Stefan Schlichthärle" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests." />
-<meta property="og:description" content="While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests." />
+<meta name="description" content="While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learnings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests." />
+<meta property="og:description" content="While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learnings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests." />
 <link rel="canonical" href="https://www.sscit.de/2021/01/05/python-bazel.html" />
 <meta property="og:url" content="https://www.sscit.de/2021/01/05/python-bazel.html" />
 <meta property="og:site_name" content="Technology and Future." />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-01-05T16:05:31+01:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Building and testing C++ Python modules with Bazel" />
+<meta property="twitter:title" content="Building and Testing C++ Python Modules with Bazel" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","url":"https://www.sscit.de/2021/01/05/python-bazel.html","headline":"Building and testing C++ Python modules with Bazel","dateModified":"2021-01-05T16:05:31+01:00","datePublished":"2021-01-05T16:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/01/05/python-bazel.html"},"description":"While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","url":"https://www.sscit.de/2021/01/05/python-bazel.html","headline":"Building and Testing C++ Python Modules with Bazel","dateModified":"2021-01-05T16:05:31+01:00","datePublished":"2021-01-05T16:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/01/05/python-bazel.html"},"description":"While working on REL, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learnings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
 <body><header class="site-header" role="banner">
@@ -41,14 +41,14 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Building and testing C++ Python modules with Bazel</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Building and Testing C++ Python Modules with Bazel</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2021-01-05T16:05:31+01:00" itemprop="datePublished">Jan 5, 2021
       </time></p>
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p>While working on <a href="/2021/01/03/REL.html">REL</a>, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.</p>
+    <p>While working on <a href="/2021/01/03/REL.html">REL</a>, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learnings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.</p>
 
 <p>As part of REL’s Python integration, I created a <code class="language-plaintext highlighter-rouge">cc_library</code> called <code class="language-plaintext highlighter-rouge">rel_py</code> which includes the core REL C++ library and the necessary Python binding (using the ingenious <a href="https://github.com/pybind/pybind11">pybind11</a> framework). If the library is built as dynamic library, the resulting <em>librel_py.so</em> file can directly be imported in every Python script via <code class="language-plaintext highlighter-rouge">import</code> statement. It took me quite some time, though, to model the dependency between a <code class="language-plaintext highlighter-rouge">py_test</code> rule and the mentioned <code class="language-plaintext highlighter-rouge">cc_library</code>. My goal was to add an integration test to Bazel, which uses REL within Python, to read a toy model and test the basic functionality, like accessing all type instances, checking the API etc.</p>
 
