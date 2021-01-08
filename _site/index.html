@@ -38,12 +38,21 @@
       <div class="wrapper">
         <div class="home">
 <h2 class="post-list-heading">Posts</h2>
-    <ul class="post-list"><li><span class="post-meta">Jan 5, 2021</span>
+    <ul class="post-list"><li><span class="post-meta">Jan 8, 2021</span>
+        <h3>
+          <a class="post-link" href="/2021/01/08/bazel-gtest.html">
+            Unit Testing with Google Test in Bazel
+          </a>
+        </h3><p><a href="https://github.com/google/googletest">Google Test</a> is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how <a href="/2021/01/03/REL.html">REL</a> uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system.</p>
+
+          
+	    <a href="/2021/01/08/bazel-gtest.html">Read more</a>
+	  </li><li><span class="post-meta">Jan 5, 2021</span>
         <h3>
           <a class="post-link" href="/2021/01/05/python-bazel.html">
             Building and testing C++ Python modules with Bazel
           </a>
-        </h3><p>While working on <a href="/2021/01/03/REL.html">REL</a>, I learned a lot about Python’s integration in Bazel and the current limitations and workarounds of the build system.</p>
+        </h3><p>While working on <a href="/2021/01/03/REL.html">REL</a>, I learned a lot about Bazel and its usage as build system in open source projects. In a series of blog posts, I will share these learings and describe different approaches. Today’s blog post addresses the integration of C++-based Python modules into Bazel and the modelling of dependencies towards the corresponding Python-based tests.</p>
 
           
 	    <a href="/2021/01/05/python-bazel.html">Read more</a>
