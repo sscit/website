@@ -1,4 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://www.sscit.de/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.sscit.de/" rel="alternate" type="text/html" /><updated>2021-01-08T20:32:18+01:00</updated><id>https://www.sscit.de/feed.xml</id><title type="html">Technology and Future.</title><subtitle>Blog about software development and technological progress.</subtitle><author><name>Stefan Schlichthärle</name></author><entry><title type="html">Unit Testing with Google Test in Bazel</title><link href="https://www.sscit.de/2021/01/08/bazel-gtest.html" rel="alternate" type="text/html" title="Unit Testing with Google Test in Bazel" /><published>2021-01-08T18:05:31+01:00</published><updated>2021-01-08T18:05:31+01:00</updated><id>https://www.sscit.de/2021/01/08/bazel-gtest</id><content type="html" xml:base="https://www.sscit.de/2021/01/08/bazel-gtest.html">&lt;p&gt;&lt;a href=&quot;https://github.com/google/googletest&quot;&gt;Google Test&lt;/a&gt; is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how &lt;a href=&quot;/2021/01/03/REL.html&quot;&gt;REL&lt;/a&gt; uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://www.sscit.de/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.sscit.de/" rel="alternate" type="text/html" /><updated>2021-02-04T21:38:37+01:00</updated><id>https://www.sscit.de/feed.xml</id><title type="html">Technology and Future.</title><subtitle>Blog about software development and technological progress.</subtitle><author><name>Stefan Schlichthärle</name></author><entry><title type="html">Optimizing REL Part 1 - Performance Measurements</title><link href="https://www.sscit.de/2021/02/03/cpp-performance-measurements.html" rel="alternate" type="text/html" title="Optimizing REL Part 1 - Performance Measurements" /><published>2021-02-03T18:05:31+01:00</published><updated>2021-02-03T18:05:31+01:00</updated><id>https://www.sscit.de/2021/02/03/cpp-performance-measurements</id><content type="html" xml:base="https://www.sscit.de/2021/02/03/cpp-performance-measurements.html">&lt;p&gt;In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics, derive conclusions and optimize the code afterwards. The first article talks about how to measure performance metrics in Linux, which tools are available and how to generate relevant data.&lt;/p&gt;
+
+&lt;h2 id=&quot;performance-kpis&quot;&gt;Performance KPIs&lt;/h2&gt;
+
+&lt;p&gt;Before optimizing an application, it is important to define performance metrics and collect data about current resource consumption. The data helps to identify hotspots, where lots of resources are consumed, and to compare the effect of different measures. Without measurements and data collection, all optimization efforts maybe address aspects that do not make an impact on the overall performance of the software, or make it even worse.&lt;/p&gt;
+
+&lt;p&gt;Useful metrics to collect are for example runtime of the software while processing a realistic data set, or RAM consumption during the same scenario. Depending on your target system, size of the binary or usage of network or other interfaces are maybe relevant KPIs as well. To optimize REL’s C++ implementation, I have been focusing on runtime and RAM consumption.&lt;/p&gt;
+
+&lt;p&gt;Before starting any measurements, it is also important to define a realistic data set. Measurements collected during “idle mode” of the software or in case of REL, with a tiny dataset, won’t provide meaningful insights. Therefore before pursuing measurements, I defined &lt;a href=&quot;https://github.com/sscit/rel/tree/main/test&quot;&gt;test data sets&lt;/a&gt; of different sizes, to ensure that the system gets under load while processing the data.&lt;/p&gt;
+
+&lt;h2 id=&quot;measuring-runtime&quot;&gt;Measuring Runtime&lt;/h2&gt;
+
+&lt;p&gt;Linux Tool &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time&lt;/code&gt; provides an easy way to measure the runtime of a program. Just run it with the program and its parameters:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;time bazel-bin/rel-cli/rel_cli -r ./test/big 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;It then returns three values, namely&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;real	0m2.509s
+user	0m2.461s
+sys	    0m0.032s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;real&lt;/code&gt; describes the time elapsed from start to finish of the program, the so called wall clock time. It includes waiting times and time, where the process was not scheduled at all.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;user&lt;/code&gt; is the time that was actually spent within the user space process, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys&lt;/code&gt; shows the time spent in the kernel within the process.&lt;/p&gt;
+
+&lt;p&gt;If &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time&lt;/code&gt; is run multiple times and with different software versions, a data set can be built up and the effect of changes can be evaluated.&lt;/p&gt;
+
+&lt;h3 id=&quot;identify-expensive-code&quot;&gt;Identify Expensive Code&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time&lt;/code&gt; gives a first indication about the overall runtime, but it does not provide any details about which parts of the code take a long time. To get this kind of information, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;perf&lt;/code&gt; can be used. It executes the process, similar to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time&lt;/code&gt;, but collects data during execution, which can be used to generate a report afterwards.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo perf record &amp;lt;binary&amp;gt; &amp;lt;binary_options&amp;gt;
+sudo perf report
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The report lists functions sorted by their CPU consumption during the execution.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Samples: 2K of event 'cpu-clock:pppH', Event count (approx.): 740750000
+Overhead  Command  Shared Object        Symbol
+  15.69%  rel_cli  libc-2.31.so         [.] __memcmp_avx2_movbe
+  12.55%  rel_cli  rel_cli              [.] std::_Rb_tree&amp;lt;std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;
+   8.64%  rel_cli  rel_cli              [.] Lexer::Read
+   4.86%  rel_cli  libstdc++.so.6.0.28  [.] std::istream::get
+   3.27%  rel_cli  rel_cli              [.] Lexer::IsOperatorOrKeyword
+   3.24%  rel_cli  libstdc++.so.6.0.28  [.] std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;::compa
+   3.17%  rel_cli  libstdc++.so.6.0.28  [.] std::istream::sentry::sentry
+   3.10%  rel_cli  libstdc++.so.6.0.28  [.] std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;::_M_re
+   2.73%  rel_cli  libc-2.31.so         [.] __memmove_avx_unaligned_erms
+   2.40%  rel_cli  libc-2.31.so         [.] __memmove_avx_unaligned
+   2.19%  rel_cli  libc-2.31.so         [.] malloc
+   2.16%  rel_cli  libc-2.31.so         [.] _int_malloc
+   2.13%  rel_cli  rel_cli              [.] FileReader::GetChar
+   1.89%  rel_cli  rel_cli              [.] Lexer::IsOperator
+   1.86%  rel_cli  libstdc++.so.6.0.28  [.] std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;::_M_re
+   1.65%  rel_cli  libc-2.31.so         [.] __strlen_avx2
+   1.52%  rel_cli  rel_cli              [.] Lexer::IsLinebreak
+   1.38%  rel_cli  libstdc++.so.6.0.28  [.] operator new
+   1.21%  rel_cli  rel_cli              [.] Lexer::CheckStringandAddToken
+   1.18%  rel_cli  rel_cli              [.] SlidingWindow::pop_front
+   1.15%  rel_cli  libc-2.31.so         [.] _int_free
+   1.15%  rel_cli  libstdc++.so.6.0.28  [.] std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;::_M_ap
+   1.15%  rel_cli  rel_cli              [.] Lexer::AddTokenToList
+   1.15%  rel_cli  rel_cli              [.] RdParser::ReadString
+   1.11%  rel_cli  libc-2.31.so         [.] cfree@GLIBC_2.2.5
+   1.11%  rel_cli  libc-2.31.so         [.] isalnum
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In this excerpt, we can see that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rel_cli&lt;/code&gt; application spends most of its time on memcopy operations, due to building up AST and token lists containing lots of strings. Additionally, method &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Read()&lt;/code&gt; within class &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Lexer&lt;/code&gt; is worth investigating. A report like this is very useful to focus on the most expensive methods first, that may offer most potential for optimizations, too. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;perf&lt;/code&gt; tool is pretty straightforward to use, too, and doesn’t require special compilation flags. The release binary including optimized code can be used for analysis.&lt;/p&gt;
+
+&lt;h2 id=&quot;measuring-ram-consumption&quot;&gt;Measuring RAM consumption&lt;/h2&gt;
+
+&lt;p&gt;Another resource that is worth optimizing is the amount of RAM required during execution. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/time/ -v&lt;/code&gt; provides valuable insights on this KPI:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/bin/time -v bazel-bin/rel-cli/rel_cli -r ./test/big 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Besides other information, it returns the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Maximum resident set size (kbytes):&lt;/code&gt;, which indicates the maximum amount of physical RAM allocated by the process during runtime. By running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/time/&lt;/code&gt; multiple times with different software versions, the impact of optimization measures in terms of RAM consumption can be evaluated.&lt;/p&gt;
+
+&lt;p&gt;In the next blog post, I will describe how I evaluated REL’s performance with these tools, and describe measures that improved the KPIs over time.&lt;/p&gt;</content><author><name>Stefan Schlichthärle</name></author><summary type="html">In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics, derive conclusions and optimize the code afterwards. The first article talks about how to measure performance metrics in Linux, which tools are available and how to generate relevant data.</summary></entry><entry><title type="html">Unit Testing with Google Test in Bazel</title><link href="https://www.sscit.de/2021/01/08/bazel-gtest.html" rel="alternate" type="text/html" title="Unit Testing with Google Test in Bazel" /><published>2021-01-08T18:05:31+01:00</published><updated>2021-01-08T18:05:31+01:00</updated><id>https://www.sscit.de/2021/01/08/bazel-gtest</id><content type="html" xml:base="https://www.sscit.de/2021/01/08/bazel-gtest.html">&lt;p&gt;&lt;a href=&quot;https://github.com/google/googletest&quot;&gt;Google Test&lt;/a&gt; is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how &lt;a href=&quot;/2021/01/03/REL.html&quot;&gt;REL&lt;/a&gt; uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system.&lt;/p&gt;
 
 &lt;p&gt;First of all, Google Test has to be added as external dependency to the Bazel WORKSPACE file. Bazel’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;new_git_repository&lt;/code&gt; rule can be used for this.&lt;/p&gt;
 
