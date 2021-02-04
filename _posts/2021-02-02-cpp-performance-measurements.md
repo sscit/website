@@ -4,7 +4,7 @@ title:  Optimizing REL Part 1 - Performance Measurements
 date:   2021-02-03 18:05:31 +0100
 ---
 
-In the last couple of weeks, I have been focusing on optimizing REL's C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics, derive conclusions and optimize the code afterwards. The first article talks about how to measure performance metrics in Linux, which tools are available and how to generate relevant data.
+In the last couple of weeks, I have been focusing on optimizing REL's C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics for C++ applications running on Linux, derive conclusions and optimize the code afterwards. The first article talks about how to measure performance metrics in Linux, which tools are available and how to generate relevant data.
 
 ## Performance KPIs
 
@@ -25,8 +25,8 @@ time bazel-bin/rel-cli/rel_cli -r ./test/big
 It then returns three values, namely 
 
 ```
-real	0m2.509s
-user	0m2.461s
+real    0m2.509s
+user    0m2.461s
 sys	    0m0.032s
 ```
 
