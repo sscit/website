@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Optimizing REL Part 1 - Optimizing the Code | Technology and Future.</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Optimizing REL Part 1 - Optimizing the Code" />
+<meta name="author" content="Stefan Schlichthärle" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics for C++ applications running on Linux, derive conclusions and optimize the code afterwards. This blog post will focus on C++ optimizations I applied to the code." />
+<meta property="og:description" content="In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics for C++ applications running on Linux, derive conclusions and optimize the code afterwards. This blog post will focus on C++ optimizations I applied to the code." />
+<link rel="canonical" href="https://www.sscit.de/2021/02/03/rel-optimization.html" />
+<meta property="og:url" content="https://www.sscit.de/2021/02/03/rel-optimization.html" />
+<meta property="og:site_name" content="Technology and Future." />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-03T18:05:31+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Optimizing REL Part 1 - Optimizing the Code" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"https://www.sscit.de/2021/02/03/rel-optimization.html","headline":"Optimizing REL Part 1 - Optimizing the Code","dateModified":"2021-02-03T18:05:31+01:00","datePublished":"2021-02-03T18:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/02/03/rel-optimization.html"},"description":"In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics for C++ applications running on Linux, derive conclusions and optimize the code afterwards. This blog post will focus on C++ optimizations I applied to the code.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology and Future.</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/imprint/">Imprint</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Optimizing REL Part 1 - Optimizing the Code</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-02-03T18:05:31+01:00" itemprop="datePublished">Feb 3, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>In the last couple of weeks, I have been focusing on optimizing REL’s C++ implementation, mainly for runtime performance and RAM consumption. In a series of blog posts, I will share my approach on how to measure performance metrics for C++ applications running on Linux, derive conclusions and optimize the code afterwards. This blog post will focus on C++ optimizations I applied to the code.</p>
+
+<h2 id="baseline-and-test-data-set">Baseline and Test Data Set</h2>
+
+<p>In the [last blog post]/2021/02/03/cpp-performance-measurements.html, I wrote about different tools and approaches, how to measure performance of C++ applications in Linux. I applied them to my implementation of REL, namely the core library and the surrounding CLI wrapper. To get representative values, I defined the <a href="https://github.com/sscit/rel/tree/main/test/huge">huge</a> test data set, which consists of more than 400k requirements, distributed among 225 files, which sum up to around 500 MB. The amount of requirements is way more than even in large software projects, but the specification of this test project is rather simple. Nevertheless, enough food for the software, to spot the impact of different implementations in its measurements.</p>
+
+<p>Baseline was <a href="https://github.com/sscit/rel/commit/9fa79fd58bc29eae549abc89e8b48fd4e01bd562">9fa79fd</a> and the following values:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Wall Time: 5min 14s
+RAM Consumption: 5,7 GB
+</code></pre></div></div>
+
+<p>Note that the wall time obviously depends a lot on the machine used to measure. As I am currently developing in an Ubuntu VM, the absolute value is not representative at all, but the change over time is for sure. Anyway, the baseline doesn’t look like performant software, 5 minutes for 500 MB of data, and eating up more than 5GB of RAM. These values clearly reflect the state of the software at this point in time, I didn’t apply any optimization, I rather focused on features and clean implementation.</p>
+
+<h2 id="optimizing-the-lexer">Optimizing the Lexer</h2>
+
+<p>After running <code class="language-plaintext highlighter-rouge">perf</code> on <code class="language-plaintext highlighter-rouge">rel_cli</code> and collecting first measurements, I quickly identified a couple of slow methods within class <code class="language-plaintext highlighter-rouge">Lexer</code>: They were called a lot during lexing of the files and consumed significant runtime, due to their poor implementation (see [05915cb])(https://github.com/sscit/rel/commit/05915cb4982165e6e19dd2cbccdb7433422db01b). Elimination of copies and using more tailored data structures already made an impact here.</p>
+
+<p>Additionally, I reworked the overall data flow of the library (see <a href="https://github.com/sscit/rel/commit/1bdb698fb4c486a1c2471a8223a7f130a6358fad">1bdb698</a>). Before, all files were lexed first, and all tokens were stored in memory, which is not necessary at all. An improved workflow goes like this: Reading one file first, creating the tokens, and parsing them afterwards immediately. In this case, the tokens created can be deleted, before starting with the next file. This change alone had a significant impact on RAM consumption.</p>
+
+<p>After the first iteration of optimizing the code, the new measurements looked like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Wall Time: 2min 47s
+RAM Consumption: 2,7 GB
+</code></pre></div></div>
+
+<p>50% off! Sounds like a good start. There are always low-hanging fruits that can be grabbed easily.</p>
+
+<h2 id="eliminating-redundant-copying-of-data">Eliminating Redundant Copying of Data</h2>
+
+<p>During the next iteration, I had a look on duplicate data storage within the key data classes <code class="language-plaintext highlighter-rouge">Token</code> and the ones used in the AST. For example, in all objects of class <code class="language-plaintext highlighter-rouge">Token</code>, I stored a string containing the full filename, where the token originated from. Same applied for objects of type <code class="language-plaintext highlighter-rouge">RdTypeInstance</code>, which represent a single type instance from the requirements data. For projects consisting of more than 400k requirements, 400k times the size of a string containing a filename indeed makes an impact. I replaced all those occurrences with a pointer to the filename. This optimization, and removing other redundant data, further decreased RAM consumption to less than 1 GB (see <a href="https://github.com/sscit/rel/commit/921705df19a99372b9742245bfa8801092a65e61">921705d</a>). Impact on runtime was only minor though.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Wall Time: 2min 40s
+RAM Consumption: 800 MB
+</code></pre></div></div>
+
+<h2 id="using-multiple-threads-to-read-and-parse-requirements-data">Using Multiple Threads to Read and Parse Requirements Data</h2>
+
+<p>While testing different configurations and collecting data, I noticed that rel_cli was running on a single core only. Of course, it was a single-threaded application, without any code running in parallel, therefore why should it benefit from all cores available in the system? Therefore I made some experiments to parallelize the library: A thread shall be created for every file, which lexes and parses the file and stores the resulting AST elements within the central data structure (see <a href="https://github.com/sscit/rel/commit/b18f8075686b7631d000d054d3dfd5f2d45c9d8c">b18f807</a>). In C++17, spawning multiple threads is quite straightforward. I defined a function closure, which handles a single file. Additionally, to avoid race conditions, I introduced mutexes in <code class="language-plaintext highlighter-rouge">RdParser</code>, whenever shared data sources are updated. The results where quite whopping: Wall time went further down to nearly one minute only, another improvement by more than 60% compared to the last iteration. But of course, there is no free lunch: Memory consumption increased again significantly, of course, multiple threads in memory means that N files are processed in parallel and the resulting tokens have to be kept in RAM.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Wall Time: 1min 01s
+RAM Consumption: 2,4 GB
+</code></pre></div></div>
+
+<p>In REL’s CI validation on Github, that is fortunately based on way more powerful IT compared to my VM, the performance metrics can be seen, too. There the validation of the huge test project went down from approx. 1 minute runtime to less than <a href="https://github.com/sscit/rel/runs/1849966084">20s</a>. With this result, I consider requirement <a href="https://github.com/sscit/rel/blob/main/requirements/5_performance.rd#L4">perf1</a> as fulfilled!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>To sum up, optimizing C++ code brings tremendous improvements in terms of resource consumptions. It is definitely worth to spent this effort, because fast software is way more user friendly compared to slow execution times and is a real business value.</p>
+
+<p>Especially for a tool like REL, which is used by individual users as well as during CI validation, the business value is significant: For the user, optimized code for both RAM and runtime increases productivity and also enables users on “slow” machines, for example virtual machines, to use the tools without frustration. In corporations, where Windows is the dominant operating system, lots of people use Linux via virtual desktop or virtual machine, therefore this environment is a relevant use case. In CI, every second that is saved pays into the overall goal of fast iteration cycles and may helps to reduce cost for the cloud.</p>
+
+<p>I am still playing around for further optimization. Due to the comprehensive test coverage of REL, introducing further changes imposes a very low risk to break something fundamental. I am still wondering if there is a sweet spot between number of threads, CPU cores available and the corresponding RAM usage. And I would like to try out if mapping the whole file in memory first may introduces another speed gain.</p>
+
+  </div><a class="u-url" href="/2021/02/03/rel-optimization.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <!--<h2 class="footer-heading">Technology and Future.</h2>-->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Stefan Schlichthärle</li><li><a class="u-email" href="mailto:website@sscit.de">website@sscit.de</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">sscit</span></a></li><li><a href="https://www.twitter.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">sscit</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Blog about software development and technological progress.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
