@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Applying Bulk Changes to REL Model with Unix Tools | Technology and Future.</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Applying Bulk Changes to REL Model with Unix Tools" />
+<meta name="author" content="Stefan Schlichthärle" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal." />
+<meta property="og:description" content="One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal." />
+<link rel="canonical" href="https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html" />
+<meta property="og:url" content="https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html" />
+<meta property="og:site_name" content="Technology and Future." />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-27T11:05:31+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Applying Bulk Changes to REL Model with Unix Tools" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html","headline":"Applying Bulk Changes to REL Model with Unix Tools","dateModified":"2021-02-27T11:05:31+01:00","datePublished":"2021-02-27T11:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html"},"description":"One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology and Future.</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/imprint/">Imprint</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Applying Bulk Changes to REL Model with Unix Tools</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-02-27T11:05:31+01:00" itemprop="datePublished">Feb 27, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal.</p>
+
+<p>The REL framework does not contain any support to apply bulk changes to the requirements model. A bulk change is required, if for example a new attribute is introduced in the type definition. After introducing it, all existing type instances that are validated with the spec are not valid anymore, because they miss one attribute. Therefore it is necessary to modify all of them, and set a feasible value. Due to the fact that the whole model resides in text files within a repository, the change can easily be applied by using Unix tools like <code class="language-plaintext highlighter-rouge">find</code> and <code class="language-plaintext highlighter-rouge">sed</code>, which are able to search for patterns in the file, and execute basic operations. Additionally, it can be applied without any risk to destroy data or overload the system. Thanks to Git, a developer can modify its local copy and tweak it until the result is consistent again. Compare this with SQL bulk changes in the production database, which may lead to data loss and emergency roll backs of the database!</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">sed</code> is not powerful enough (is that really possible?), the next level would be to use REL’s Python integration and write a small script that reads the REL model and prints it out again. That’s more effort for sure, but in this case it’s impossible that the data transformation cannot be resolved, as the script can perform any operation in between. The only aspect to consider in this case is that in order to read the requirements model with Python, it has to be consistent. Therefore the change within specification has to be kept “on hold”, and an inconsistent model has to be printed out first, before the spec change is applied and miraculously, everything gets consistent again.</p>
+
+<p>In the following paragraphs, I explain a couple of use cases, how to use Linux command line tools and apply bulk changes to a model. I use the <a href="https://github.com/sscit/rel/tree/main/test/big">big</a> test model in REL’s test folder, which contains around 4000 requirements and a decent specification, which allows me to play around with different use cases.</p>
+
+<h2 id="deleting-an-attribute-from-specification">Deleting an Attribute from Specification</h2>
+
+<p>Let’s assume the requirements team decided to delete one attribute from the <a href="https://github.com/sscit/rel/blob/main/test/big/spec.rs#L22">ComponentRequirement</a> type definition, namely attribute <a href="https://github.com/sscit/rel/blob/main/test/big/spec.rs#L39">Is_implemented</a>. During the course of the project, the team learned that it doesn’t make sense to have this information in the requirements model, because it can be derived out of the linked test cases and the test results.</p>
+
+<p>Deleting it is trivial, just remove the <a href="https://github.com/sscit/rel/blob/main/test/big/spec.rs#L39">line</a> out of the spec. But what about all the other 4000 requirements, that are now invalid, which also prevents committing the change to the server, because it fails during CI validation? Let’s use the following Linux commands, to modify all files and delete the attribute:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/rel/test/big$ find . -name "*.rd" -type f -exec sed -i -e /Is_implemented/d {} \;
+</code></pre></div></div>
+
+<p>Firstly, <code class="language-plaintext highlighter-rouge">find</code> lists all files of type “.rd” and runs <code class="language-plaintext highlighter-rouge">sed</code> on them. <code class="language-plaintext highlighter-rouge">sed</code> simply removes every line containing “Is_implemented”. To make it even more precise, space and colon that identify an attribute exactly can be included in the command. Checking the difference afterwards with <code class="language-plaintext highlighter-rouge">git diff</code> ensures that only the expected change has been created, wrong detections can be reverted. No matter how big the project is, this search and replace of the relevant attribute hardly takes a couple of minutes. When I compare this to database tools for requirements engineering, the advantages are obvious: If they do not support bulk changes, it’s your (or the interns) job to replace all occurrences manually. If they do, it’s often restricted to the admins, to prevent damage. If you are the lucky one with privileges to pursue bulk changes, it’s often a delicate story to use the GUI and run the job: What if there is an error, and the whole production data gets a mess? Anyway, not comparable to patching text files locally and committing the delta afterwards without hassle.</p>
+
+<h2 id="adding-a-new-attribute-to-type-definition">Adding a new Attribute to Type Definition</h2>
+
+<p>Let’s have a look at another typical use case: Type definition <a href="https://github.com/sscit/rel/blob/main/test/big/spec.rs#L3">SystemRequirement</a> is extended with a new attribute. After the owner, a new attribute called <code class="language-plaintext highlighter-rouge">Origin</code> shall be added, which is either <code class="language-plaintext highlighter-rouge">Internal</code> or <code class="language-plaintext highlighter-rouge">External</code>, depending on the requirement’s origin. Setting all of them to <code class="language-plaintext highlighter-rouge">Internal</code> is simple:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/rel/test/big/SystemRequirements$ find . -name "*.rd" -type f -exec sed -i -e "/Owner :/a\\    Origin : Internal," {} \;
+</code></pre></div></div>
+
+<p>Some remarks on that:</p>
+<ul>
+  <li>First of all, don’t forget the leading whitespace, otherwise the text layout gets broken or another iteration with formatting script is required</li>
+  <li>In this example, we benefit from the fact that all system requirements that shall be modified are located in a folder hierarchy. The tricky aspect is that component requirements also contain the <code class="language-plaintext highlighter-rouge">Owner</code> attribute, but shall not be modified. How to deal with it, if you cannot rely on the folder structure? Well, in this case, either the condition to look for within <code class="language-plaintext highlighter-rouge">sed</code>’s command line has to be more sophisticated, to detect the requirement’s type via regex, or you use the approach sketched above with the Python script, that reads the whole model and writes it back again. While writing it back, you add your custom hooks that trigger only when you are at the right position to introduce the change.</li>
+  <li>In the example, we always add <code class="language-plaintext highlighter-rouge">Internal</code> to the type instances, but what if it is necessary to evaluate a condition per system requirement to decide about that? My solution at the moment: Add the most likely value to all system requirements, and adapt the others manually afterwards. Depending on the numbers, this approach is often pretty pragmatic and works well. Otherwise, use the Python approach, reading everything and while writing it back, evaluate the condition.</li>
+</ul>
+
+<h2 id="using-python-script-to-modify-model">Using Python Script to modify Model</h2>
+
+<p>As I mentioned already, the most sophisticated approach is to write a Python script that reads the whole model and prints it back. While doing this, you can add your custom hooks to modify at the right position, by e.g. introducing a new attribute. I am thinking about writing the skeleton of such a script and adding it to the framework, which reads everything and writes it back the same way. In this case you can focus on writing the hooks, if you encounter the need to apply a bulk change to the whole model. Another benefit of such a script: It also acts as formatting tool, to remove unintended newlines, whitespaces, wrong indentation etc. After reading the model and writing it back, all files look consistent im terms of coding guidelines.</p>
+
+  </div><a class="u-url" href="/2021/02/27/applying-bulk-changes-to-rel-model.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <!--<h2 class="footer-heading">Technology and Future.</h2>-->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Stefan Schlichthärle</li><li><a class="u-email" href="mailto:website@sscit.de">website@sscit.de</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">sscit</span></a></li><li><a href="https://www.twitter.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">sscit</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Blog about software development and technological progress.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
