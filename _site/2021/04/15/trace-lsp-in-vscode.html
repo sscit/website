@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Trace LSP Communication to Visual Studio Code’s Output Console | Technology and Future.</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Trace LSP Communication to Visual Studio Code’s Output Console" />
+<meta name="author" content="Stefan Schlichthärle" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="It is possible to trace all language server protocol communication to Visual Studio Code’s output console, as described in the developer’s guide. The explanation in the guide is quite hard to understand, though. In this post, I explain more details about how to configure VSCode’s LSP implementation, so that the traces are printed out." />
+<meta property="og:description" content="It is possible to trace all language server protocol communication to Visual Studio Code’s output console, as described in the developer’s guide. The explanation in the guide is quite hard to understand, though. In this post, I explain more details about how to configure VSCode’s LSP implementation, so that the traces are printed out." />
+<link rel="canonical" href="https://www.sscit.de/2021/04/15/trace-lsp-in-vscode.html" />
+<meta property="og:url" content="https://www.sscit.de/2021/04/15/trace-lsp-in-vscode.html" />
+<meta property="og:site_name" content="Technology and Future." />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-15T12:05:31+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Trace LSP Communication to Visual Studio Code’s Output Console" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"https://www.sscit.de/2021/04/15/trace-lsp-in-vscode.html","headline":"Trace LSP Communication to Visual Studio Code’s Output Console","dateModified":"2021-04-15T12:05:31+02:00","datePublished":"2021-04-15T12:05:31+02:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/04/15/trace-lsp-in-vscode.html"},"description":"It is possible to trace all language server protocol communication to Visual Studio Code’s output console, as described in the developer’s guide. The explanation in the guide is quite hard to understand, though. In this post, I explain more details about how to configure VSCode’s LSP implementation, so that the traces are printed out.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology and Future.</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/imprint/">Imprint</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Trace LSP Communication to Visual Studio Code&#39;s Output Console</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-04-15T12:05:31+02:00" itemprop="datePublished">Apr 15, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>It is possible to trace all language server protocol communication to Visual Studio Code’s output console, as described in the <a href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide#logging-support-for-language-server">developer’s guide</a>. The explanation in the guide is quite hard to understand, though. In this post, I explain more details about how to configure VSCode’s LSP implementation, so that the traces are printed out.</p>
+
+<blockquote>
+  <p>If you are using vscode-languageclient to implement the client, you can specify a setting [langId].trace.server that instructs the Client to log communications between Language Client / Server to a channel of the Language Client’s name.</p>
+</blockquote>
+
+<p>It took me quite some time to figure out <em>where</em> to specify the setting (aka <em>configuration option</em>) mentioned in the user guide. It is possible to define a file <code class="language-plaintext highlighter-rouge">settings.json</code> within the <code class="language-plaintext highlighter-rouge">.vscode</code> folder of your <strong>project</strong>. In this context, <strong>project</strong> means the files that are processed by your extension. In case of REL, a <strong>project</strong> is a set of requirements specification and requirements data files. The configuration option is not specified within your extension development folder. <code class="language-plaintext highlighter-rouge">settings.json</code> then contains configuration options that are applied to the running instance of VSCode (and its extensions), that opens the folder.</p>
+
+<p>If your LSP client extension is based on <code class="language-plaintext highlighter-rouge">vscode-languageclient</code>, you can define the setting <code class="language-plaintext highlighter-rouge">"ClientId.trace.server": "verbose"</code> within this file. The <code class="language-plaintext highlighter-rouge">ClientId</code> is defined within the <code class="language-plaintext highlighter-rouge">extension.js</code> file, as part of the properties to create a <code class="language-plaintext highlighter-rouge">LanguageClient</code> object (For an example, have a look at <a href="https://github.com/sscit/rel/blob/main/vscode-ext/extension.js#L28">REL’s VSCode Extension</a> )</p>
+
+<p>The resulting <code class="language-plaintext highlighter-rouge">settings.json</code> then looks like this (assuming no other options are set)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    "RELLanguageClient.trace.server": "verbose",
+}
+</code></pre></div></div>
+
+<p>With the configuration option set to <code class="language-plaintext highlighter-rouge">verbose</code>, as soon as the folder is opened in Visual Studio Code, all JSON messages to and from the language server are printed into the output console of Visual Studio Code, in a separate channel called <code class="language-plaintext highlighter-rouge">RELLanguageClient</code>.</p>
+
+  </div><a class="u-url" href="/2021/04/15/trace-lsp-in-vscode.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <!--<h2 class="footer-heading">Technology and Future.</h2>-->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Stefan Schlichthärle</li><li><a class="u-email" href="mailto:website@sscit.de">website@sscit.de</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">sscit</span></a></li><li><a href="https://www.twitter.com/sscit"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">sscit</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Blog about software development and technological progress.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
