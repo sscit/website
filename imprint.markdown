@@ -9,8 +9,8 @@ permalink: /imprint/
 Stefan Schlichthärle\
 _Software Developer_
 
-Bautzener Straße 36\
-80997 München
+Chemnitzer Platz 11\
+80992 München
 
 E-Mail: [website@sscit.de](mailto:website@sscit.de)
 
@@ -18,8 +18,8 @@ E-Mail: [website@sscit.de](mailto:website@sscit.de)
 # Verantwortlicher für journalistisch-redaktionelle gestaltete Inhalte:
 
 Stefan Schlichthärle\
-Bautzener Straße 36\
-80997 München
+Chemnitzer Platz 11\
+80992 München
 
 E-Mail: [website@sscit.de](mailto:website@sscit.de)
 
