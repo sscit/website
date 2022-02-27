@@ -18,8 +18,8 @@ E-Mail: [website@sscit.de](mailto:website@sscit.de)
 # Verantwortlicher für journalistisch-redaktionelle gestaltete Inhalte:
 
 Stefan Schlichthärle\
-Chemnitzer Platz 11\
-80992 München
+Förderreutherstraße 13\
+87561 Oberstdorf
 
 E-Mail: [website@sscit.de](mailto:website@sscit.de)
 
