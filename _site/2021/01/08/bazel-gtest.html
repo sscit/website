@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Unit Testing with Google Test in Bazel | Technology, Future, and Hiking.</title>
+<title>Unit Testing with Google Test in Bazel | Technology and Future.</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Unit Testing with Google Test in Bazel" />
 <meta name="author" content="Stefan Schlichthärle" />
@@ -12,18 +12,18 @@
 <meta property="og:description" content="Google Test is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how REL uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system." />
 <link rel="canonical" href="https://www.sscit.de/2021/01/08/bazel-gtest.html" />
 <meta property="og:url" content="https://www.sscit.de/2021/01/08/bazel-gtest.html" />
-<meta property="og:site_name" content="Technology, Future, and Hiking." />
+<meta property="og:site_name" content="Technology and Future." />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-01-08T18:05:31+01:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Unit Testing with Google Test in Bazel" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","url":"https://www.sscit.de/2021/01/08/bazel-gtest.html","headline":"Unit Testing with Google Test in Bazel","dateModified":"2021-01-08T18:05:31+01:00","datePublished":"2021-01-08T18:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/01/08/bazel-gtest.html"},"description":"Google Test is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how REL uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system.","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/01/08/bazel-gtest.html"},"url":"https://www.sscit.de/2021/01/08/bazel-gtest.html","author":{"@type":"Person","name":"Stefan Schlichthärle"},"headline":"Unit Testing with Google Test in Bazel","dateModified":"2021-01-08T18:05:31+01:00","datePublished":"2021-01-08T18:05:31+01:00","description":"Google Test is a well-established framework for unit tests in C++. It provides lots of features and can be used to write tests for own classes and their methods. Its integration in Bazel build system works quite well, with the benefit that it is not necessary to copy Google Test source files into the own repository or use Git submodules, as Google Test’s repository is downloaded on demand by Bazel during the build process. In this blog post, I will describe how REL uses Google Test. This approach can easily be transferred to every C++ development project that uses Bazel as build system.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology, Future, and Hiking." /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
 <body><header class="site-header" role="banner">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology, Future, and Hiking.</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology and Future.</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -124,7 +124,7 @@ cc_library(
 
   <div class="wrapper">
 
-    <!--<h2 class="footer-heading">Technology, Future, and Hiking.</h2>-->
+    <!--<h2 class="footer-heading">Technology and Future.</h2>-->
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">

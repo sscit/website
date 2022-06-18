@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Applying Bulk Changes to REL Model with Unix Tools | Technology, Future, and Hiking.</title>
+<title>Applying Bulk Changes to REL Model with Unix Tools | Technology and Future.</title>
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Applying Bulk Changes to REL Model with Unix Tools" />
 <meta name="author" content="Stefan Schlichthärle" />
@@ -12,18 +12,18 @@
 <meta property="og:description" content="One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal." />
 <link rel="canonical" href="https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html" />
 <meta property="og:url" content="https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html" />
-<meta property="og:site_name" content="Technology, Future, and Hiking." />
+<meta property="og:site_name" content="Technology and Future." />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-02-27T11:05:31+01:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Applying Bulk Changes to REL Model with Unix Tools" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","url":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html","headline":"Applying Bulk Changes to REL Model with Unix Tools","dateModified":"2021-02-27T11:05:31+01:00","datePublished":"2021-02-27T11:05:31+01:00","author":{"@type":"Person","name":"Stefan Schlichthärle"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html"},"description":"One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal.","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html"},"url":"https://www.sscit.de/2021/02/27/applying-bulk-changes-to-rel-model.html","author":{"@type":"Person","name":"Stefan Schlichthärle"},"headline":"Applying Bulk Changes to REL Model with Unix Tools","dateModified":"2021-02-27T11:05:31+01:00","datePublished":"2021-02-27T11:05:31+01:00","description":"One of the design philosophies I was following during the development of the REL framework was to carefully evaluate every feature, whether it is really needed within the framework or if there are already solutions available that can be leveraged. In my professional life, I regularly observe that every software product can be literally destroyed by pressing more and more features into it, to cover every obscure use case (“we always did it like that”) and at the same time sacrificing (code) quality and tests. This leads to unmaintainable software, which is bloated, slow and finally, when the original development team is not available anymore, will be replaced by something new. Focusing on a carefully selected set of features also means that other use cases have to be covered by alternative tools and approaches. The goal should always be to find the most efficient way to tackle a use case, by leveraging methods and tools that are already available and fit best. In today’s blog post, I am writing about bulk changes that have to be applied to the whole requirements model. It’s a use case every requirements engineer is very familiar with and I explain why I didn’t implement dedicated support for this into the framework and rather rely on the use of Unix tools to reach the goal.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology, Future, and Hiking." /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.sscit.de/feed.xml" title="Technology and Future." /></head>
 <body><header class="site-header" role="banner">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology, Future, and Hiking.</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Technology and Future.</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -94,7 +94,7 @@
 
   <div class="wrapper">
 
-    <!--<h2 class="footer-heading">Technology, Future, and Hiking.</h2>-->
+    <!--<h2 class="footer-heading">Technology and Future.</h2>-->
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
