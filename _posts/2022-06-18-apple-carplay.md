@@ -1,0 +1,15 @@
+---
+layout: post
+title:  Thoughts on Apple CarPlay's Extension towards all Vehicle Displays
+date:   2022-06-18 11:05:31 +0100
+---
+
+During the latest WWDC conference in June this year, Apple showcased their vision for Apple CarPlay for the next few years. In  a nutshell, they plan to extend Apple CarPlay to all displays within the vehicle, including the instrument cluster that displays essential vehicle information like velocity. According to the press coverage, this is considered as the next step towards the Apple Car. Taking over all displays eventually replaces a vehicle's identity as intended by the OEM by the Apple look and feel, thus transforming it into the Apple Car.
+ 
+I doubt, though, that the vision showcased during WWDC 2022 can be realized in this way, because the instrument cluster is not about infotainment. The display in front of the driver not only shows velocity and range, but also homologation-relevant information like engine status or errors within the braking system. Have you ever wondered what the yellow and red icons actually mean? Well, they may indicate that the dynamic stability control of the vehicle is disabled due to an error, and therefore the vehicle does not mitigate spins anymore. This imposes a severe risk for the driver, and therefore error messages like that are covered by safety measures and developed with ASIL-certified processes, to ensure state-of-the-art safety development and functionality. For accreditation, authorities have strict rules on these functionalities and changes after start of production of the vehicle can lead to loss of the vehicle type approval. Therefore I doubt that it is even legal to simply replace these visuals with a custom overlay.
+ 
+Besides that, software developers at OEMs spend significant efforts in developing low-latency software that meets all real-time requirements. A slight delay, e.g. of the velocity displayed on the main display, is simply not acceptable for the driver. 100 milliseconds can already make a difference between smooth perception of an information displayed and irritating delays (like a jerking computer game). It is already quite challenging to fulfill these requirements in an environment where the data is processed within the vehicle only. Now imagine including an IPhone into this loop, including its Bluetooth stack, signal processing, and all the way back to the display.
+ 
+In a nutshell, I can understand the vision Apple is drawing for CarPlay, but I doubt it will end up as shown on the artworks during the presentation. Technical challenges, safety and legal requirements, and eventually the OEMs fear to lose their unique look and feel completely will prevent this. Nevertheless, it's another step towards the Apple Car, and I am convinced that the actual release of the Apple Car (whenever this will be), will surprise everybody in terms of new ideas and creativity on how a vehicle can be designed today.
+
+ 
